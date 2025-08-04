@@ -36,10 +36,7 @@ const translations = {
     signup_fail: "Failed to create account.",
     // Home Page
     home_title1: "Inventory Management",
-    home_title2: "for Modern Construction",
-    home_subtitle:
-      "Real-time tracking, powerful analytics, and seamless user management.",
-    home_getStarted: "Get started",
+    home_getStarted: "Sign Up As a New User",
     // Reports Dashboard
     reports_title: "Low Stock Report",
     reports_loading: "Loading low stock report...",
@@ -123,10 +120,7 @@ const translations = {
     signup_fail: "Krijimi i llogarisë dështoi.",
     // Home Page
     home_title1: "Menaxhimi i Inventarit",
-    home_title2: "për Ndërtimin Modern",
-    home_subtitle:
-      "Gjurmim në kohë reale, analitika të fuqishme dhe menaxhim i lehtë i përdoruesve.",
-    home_getStarted: "Fillo tani",
+    home_getStarted: "Regjistrohu si Perdorues i Ri",
     // Reports Dashboard
     reports_title: "Raporti i Stokut të Ulët",
     reports_loading: "Duke ngarkuar raportin e stokut të ulët...",
