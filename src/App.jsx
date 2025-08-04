@@ -100,6 +100,7 @@ function MainApp() {
         return <HomePage setView={setView} />;
     }
   };
+  console.log("User permissions from JWT:", userPermissions);
 
   return (
     <div className="flex flex-col min-h-screen">
