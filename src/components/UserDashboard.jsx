@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useTranslation } from "../i18n.js";
+import { useTranslation } from "../i18n.jsx";
 
 export default function UserDashboard({ authToken, userPermissions }) {
   const [products, setProducts] = useState([]);
