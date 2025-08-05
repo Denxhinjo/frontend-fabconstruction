@@ -17,8 +17,8 @@ export default function HomePage({ setView }) {
                 <h1 className="text-center text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
                   <span className="block text-white">{t("home_title1")}</span>
                 </h1>
-                <div className="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center">
-                  <div className="space-y-4 sm:space-y-0 sm:mx-auto sm:inline-grid sm:grid-cols-1 sm:gap-5">
+                <div className="mt-10 max-w-sm mx-auto flex justify-center">
+                  <div className="space-y-4 sm:space-y-0 sm:inline-grid sm:grid-cols-1 sm:gap-5">
                     <button
                       onClick={() => setView("signup")}
                       className="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-amber-800 bg-white hover:bg-amber-50 sm:px-8"
