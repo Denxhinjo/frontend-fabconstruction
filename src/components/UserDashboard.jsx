@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "../i18n.jsx";
 
 export default function UserDashboard({ authToken, userPermissions }) {
+  // ... (all existing state variables remain the same)
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,14 +26,18 @@ export default function UserDashboard({ authToken, userPermissions }) {
   const [uploadMessage, setUploadMessage] = useState("");
   const { t } = useTranslation();
 
+  // --- NEW: State to manage the image lightbox ---
+  const [lightboxImage, setLightboxImage] = useState(null);
+
   const canAddProduct = userPermissions.includes("inventory.add_product");
   const canChangeProduct = userPermissions.includes("inventory.change_product");
   const canDeleteProduct = userPermissions.includes("inventory.delete_product");
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  // --- MOVED fetchProducts and fetchLocations here ---
+  // ... (all your handler functions like fetchProducts, handleAddProduct, etc. remain the same)
   const fetchProducts = async () => {
+    if (!authToken) return;
     setIsLoading(true);
     let url = `${API_BASE_URL}/api/products/?location_id=${locationFilter}`;
     try {
@@ -51,6 +56,7 @@ export default function UserDashboard({ authToken, userPermissions }) {
   };
 
   const fetchLocations = async () => {
+    if (!authToken) return;
     try {
       const response = await fetch(`${API_BASE_URL}/api/locations/`, {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -64,10 +70,8 @@ export default function UserDashboard({ authToken, userPermissions }) {
   };
 
   useEffect(() => {
-    if (authToken) {
-      fetchLocations();
-      fetchProducts();
-    }
+    fetchLocations();
+    fetchProducts();
   }, [authToken, locationFilter]);
 
   const handleAddProduct = async (e) => {
@@ -89,7 +93,7 @@ export default function UserDashboard({ authToken, userPermissions }) {
       setIsAddModalOpen(false);
       setNewProduct({ name: "", sku: "", quantity: 0, location: "" });
       setNewProductImage(null);
-      fetchProducts(); // This will now work correctly
+      fetchProducts();
     } catch (err) {
       alert(`Error adding product: ${err.message}`);
     }
@@ -116,7 +120,7 @@ export default function UserDashboard({ authToken, userPermissions }) {
       );
       if (!response.ok) throw new Error(JSON.stringify(await response.json()));
       setIsEditModalOpen(false);
-      fetchProducts(); // This will now work correctly
+      fetchProducts();
     } catch (err) {
       alert(`Error updating product: ${err.message}`);
     }
@@ -140,7 +144,7 @@ export default function UserDashboard({ authToken, userPermissions }) {
       });
       if (!response.ok) throw new Error(JSON.stringify(await response.json()));
       setIsUpdateModalOpen(false);
-      fetchProducts(); // This will now work correctly
+      fetchProducts();
     } catch (err) {
       alert(`Error updating stock: ${err.message}`);
     }
@@ -159,7 +163,7 @@ export default function UserDashboard({ authToken, userPermissions }) {
         }
       );
       if (!response.ok) throw new Error("Failed to delete the product.");
-      fetchProducts(); // This will now work correctly
+      fetchProducts();
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
@@ -202,6 +206,7 @@ export default function UserDashboard({ authToken, userPermissions }) {
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      {/* ... (Header and filter buttons remain the same) ... */}
       <div className="flex justify-between items-center mb-4 flex-wrap">
         <h1 className="text-2xl font-semibold text-gray-900">
           {t("dashboard_title")}
@@ -263,6 +268,7 @@ export default function UserDashboard({ authToken, userPermissions }) {
           )}
         </div>
       )}
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => (
           <div
@@ -271,6 +277,7 @@ export default function UserDashboard({ authToken, userPermissions }) {
           >
             <div className="w-full flex items-center justify-between p-6 space-x-6">
               <div className="flex-1 truncate">
+                {/* ... (product text details remain the same) ... */}
                 <div className="flex items-center space-x-3">
                   <h3 className="text-gray-900 text-sm font-medium truncate">
                     {product.name}
@@ -292,16 +299,19 @@ export default function UserDashboard({ authToken, userPermissions }) {
                   {product.quantity} {t("dashboard_inStock")}
                 </span>
               </div>
+              {/* --- UPDATED: Added onClick to the image --- */}
               <img
-                className="w-16 h-16 bg-gray-300 rounded-md flex-shrink-0 object-cover"
+                className="w-16 h-16 bg-gray-300 rounded-md flex-shrink-0 object-cover cursor-pointer hover:opacity-75 transition"
                 src={
                   product.image ||
                   "https://placehold.co/100x100/e2e8f0/e2e8f0?text=Pa-Imazh"
                 }
                 alt={product.name}
+                onClick={() => product.image && setLightboxImage(product.image)}
               />
             </div>
             <div>
+              {/* ... (product action buttons remain the same) ... */}
               <div className="-mt-px flex divide-x divide-gray-200">
                 {canChangeProduct && (
                   <>
@@ -344,6 +354,8 @@ export default function UserDashboard({ authToken, userPermissions }) {
           </div>
         ))}
       </div>
+
+      {/* ... (Add, Edit, and Update modals remain the same) ... */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 max-w-md w-full">
@@ -551,6 +563,27 @@ export default function UserDashboard({ authToken, userPermissions }) {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* --- NEW: Image Lightbox Modal --- */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={() => setLightboxImage(null)} // Close modal on background click
+        >
+          <img
+            src={lightboxImage}
+            alt="Enlarged product"
+            className="max-w-full max-h-full rounded-lg"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on the image itself
+          />
+          <button
+            className="absolute top-4 right-4 text-white text-2xl font-bold"
+            onClick={() => setLightboxImage(null)}
+          >
+            &times;
+          </button>
         </div>
       )}
     </div>
