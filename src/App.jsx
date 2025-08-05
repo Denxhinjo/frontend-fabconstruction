@@ -29,11 +29,15 @@ import UserDashboard from "./components/UserDashboard";
 // }
 
 // This is the main application component that contains the logic
+// This is the main application component that contains the logic
 function MainApp() {
   const [view, setView] = useState("home");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userPermissions, setUserPermissions] = useState([]);
   const [authToken, setAuthToken] = useState(localStorage.getItem("authToken"));
+
+  // --- NEW: State to manage the fade transition ---
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -55,7 +59,8 @@ function MainApp() {
       setIsLoggedIn(true);
       setAuthToken(token);
       setUserPermissions(userData.permissions || []);
-      setView("dashboard");
+      // Use the transition handler to switch to the dashboard
+      handleSetView("dashboard");
     }
   };
 
@@ -64,7 +69,21 @@ function MainApp() {
     setIsLoggedIn(false);
     setAuthToken(null);
     setUserPermissions([]);
-    setView("home");
+    // Use the transition handler to go home
+    handleSetView("home");
+  };
+
+  // --- NEW: Function to handle view changes with a fade effect ---
+  const handleSetView = (newView) => {
+    if (view === newView) return; // Don't transition if the view is the same
+
+    setIsTransitioning(true); // Start fade-out
+
+    // After the fade-out duration, change the component and fade it back in
+    setTimeout(() => {
+      setView(newView);
+      setIsTransitioning(false); // Start fade-in
+    }, 300); // This duration should match the CSS transition duration
   };
 
   const renderView = () => {
@@ -91,25 +110,34 @@ function MainApp() {
     switch (view) {
       case "login":
         return (
-          <LoginForm setView={setView} onLoginSuccess={handleLoginSuccess} />
+          <LoginForm
+            setView={handleSetView}
+            onLoginSuccess={handleLoginSuccess}
+          />
         );
       case "signup":
-        return <SignUpForm setView={setView} />;
+        return <SignUpForm setView={handleSetView} />;
       case "home":
       default:
-        return <HomePage setView={setView} />;
+        return <HomePage setView={handleSetView} />;
     }
   };
-  console.log("User permissions from JWT:", userPermissions);
 
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar
         isLoggedIn={isLoggedIn}
         onLogout={handleLogout}
-        setView={setView}
+        setView={handleSetView} // Pass the new handler to the Navbar
       />
-      <main className="flex-grow">{renderView()}</main>
+      {/* --- UPDATED: Added transition classes to the main content area --- */}
+      <main
+        className={`flex-grow transition-opacity duration-300 ${
+          isTransitioning ? "opacity-0" : "opacity-100"
+        }`}
+      >
+        {renderView()}
+      </main>
       {!isLoggedIn && <Footer />}
     </div>
   );
