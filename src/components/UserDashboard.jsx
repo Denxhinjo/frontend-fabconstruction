@@ -573,10 +573,13 @@ export default function UserDashboard({ authToken, userPermissions }) {
           onClick={() => setLightboxImage(null)} // Close modal on background click
         >
           <img
-            src={lightboxImage}
-            alt="Enlarged product"
-            className="max-w-full max-h-full rounded-lg"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on the image itself
+            className="w-16 h-16 bg-gray-300 rounded-md flex-shrink-0 object-cover cursor-pointer transform hover:scale-105 hover:opacity-80 transition duration-300"
+            src={
+              product.image ||
+              "https://placehold.co/100x100/e2e8f0/e2e8f0?text=Pa-Imazh"
+            }
+            alt={product.name}
+            onClick={() => product.image && setLightboxImage(product.image)}
           />
           <button
             className="absolute top-4 right-4 text-white text-2xl font-bold"
